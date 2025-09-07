@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import StudentInfoDialog from "./StudentInfoDialog";
 
 function UsersTable() {
-
   const [students, setStudents] = useState<any[]>([]);
   const [selectedStudent, setSelectedStudent] = useState<any | null>(null);
 
@@ -23,7 +22,9 @@ function UsersTable() {
   return (
     <div className="min-h-screen bg-gray-900 text-gray-100 p-8">
       {/* Page Title */}
-      <h1 className="text-2xl font-bold mb-6 text-center">Student Mini Portal</h1>
+      <h1 className="text-2xl font-bold mb-6 text-center">
+        Student Mini Portal
+      </h1>
 
       {/* Card */}
       <div className="p-6 bg-gray-800 rounded-2xl shadow-md">
@@ -53,10 +54,16 @@ function UsersTable() {
                   className="hover:bg-indigo-500/50 cursor-pointer"
                   onClick={() => setSelectedStudent(stud)}
                 >
-                  <td className="px-4 py-3 font-medium text-white">{stud.fullname}</td>
-                  <td className="px-4 py-3 text-gray-300">{stud.data.course}</td>
+                  <td className="px-4 py-3 font-medium text-white">
+                    {stud.fullname}
+                  </td>
+                  <td className="px-4 py-3 text-gray-300">
+                    {stud.data.course}
+                  </td>
                   <td className="px-4 py-3 text-gray-300">{stud.data.year}</td>
-                  <td className="px-4 py-3 text-gray-300">{stud.data.address}</td>
+                  <td className="px-4 py-3 text-gray-300">
+                    {stud.data.address}
+                  </td>
                 </tr>
               ))}
             </tbody>
@@ -65,9 +72,16 @@ function UsersTable() {
       </div>
 
       {selectedStudent && (
-        <StudentInfoDialog stud={selectedStudent} onClose={() => setSelectedStudent(null)}/>
+        <StudentInfoDialog
+          student={selectedStudent}
+          updateChanges={() =>
+            setStudents((prev) =>
+              prev.filter((s) => s.fullname !== selectedStudent.fullname)
+            )
+          }
+          onClose={() => setSelectedStudent(null)}
+        />
       )}
-
     </div>
   );
 }
