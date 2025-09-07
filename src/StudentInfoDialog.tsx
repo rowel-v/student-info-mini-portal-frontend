@@ -1,6 +1,6 @@
 import { X } from "lucide-react";
 import { useState } from "react";
-import DeleteConfirmationDialog from "./Dialog";
+import { DeleteConfirmationDialog, EditStudentDialog } from "./Dialog";
 
 class Student {
   fullname: string;
@@ -20,7 +20,7 @@ class Student {
   }
 }
 
-function deleteStudentRequest(fullname: string) {
+async function deleteStudentRequest(fullname: string) {
   fetch("http://localhost:8080/student", {
     method: "DELETE",
     headers: {
@@ -46,6 +46,7 @@ function StudentInfoDialog({
   updateChanges: () => void;
 }) {
   const [deleteDialogIsOpen, setDeleteDialogIsOpen] = useState(false);
+  const [editDialogIsOpen, setEditDialogIsOpen] = useState(false);
 
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-gray/20 backdrop-blur-sm">
@@ -93,7 +94,7 @@ function StudentInfoDialog({
 
           <button
             className="mt-4 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-4 rounded-lg transition"
-            onClick={onClose}
+            onClick={() => setEditDialogIsOpen(true)}
           >
             Edit
           </button>
@@ -111,9 +112,18 @@ function StudentInfoDialog({
             onCancel={() => setDeleteDialogIsOpen(false)}
           />
         )}
+
+        {editDialogIsOpen && (
+          <EditStudentDialog
+            student={student}
+            onSave={() => null}
+            onClose={() => setEditDialogIsOpen(false)}
+          />
+        )}
       </div>
     </div>
   );
 }
 
 export default StudentInfoDialog;
+export { Student };
