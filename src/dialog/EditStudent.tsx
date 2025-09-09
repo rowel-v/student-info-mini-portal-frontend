@@ -1,39 +1,7 @@
 import { X } from "lucide-react";
-import { Student } from "./StudentInfoDialog";
+import { Student } from "./StudentInfo";
 import { useState } from "react";
-
-function DeleteConfirmationDialog({
-  onConfirm,
-  onCancel,
-}: {
-  onConfirm: () => void;
-  onCancel: () => void;
-}) {
-  return (
-    <div className="fixed inset-0 flex items-center justify-center bg-black/40 backdrop-blur-sm z-50">
-      <div className="bg-gray-900 p-6 rounded-xl shadow-xl w-80">
-        <h2 className="text-lg font-semibold text-red-400 mb-4">
-          Confirm Deletion
-        </h2>
-
-        <div className="flex justify-end space-x-3">
-          <button
-            className="bg-gray-600 hover:bg-gray-500 text-white px-4 py-2 rounded-lg"
-            onClick={onCancel}
-          >
-            Cancel
-          </button>
-          <button
-            className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg"
-            onClick={onConfirm}
-          >
-            Confirm
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-}
+import { SaveConfirmationDialog } from "./SaveConfirmation";
 
 async function updateStudentRequest(
   fullname: string,
@@ -53,6 +21,17 @@ async function updateStudentRequest(
   }
 }
 
+const studentDataAreSame = (student1: Student, student2: Student): boolean => {
+  return (
+    student1.firstname === student2.firstname &&
+    student1.middlename === student2.middlename &&
+    student1.lastname === student2.lastname &&
+    student1.data.course === student2.data.course &&
+    student1.data.year === student2.data.year &&
+    student1.data.address === student2.data.address
+  );
+};
+
 function EditStudentDialog({
   onSave,
   onClose,
@@ -62,9 +41,15 @@ function EditStudentDialog({
   onClose: () => void;
   student: Student;
 }) {
-  const [updatedFullName, setUpdatedFullName] = useState(student.fullname);
+  const [saveButtonIsClicked, setSaveButtonIsClicked] = useState(false);
+
+  const [updatedFirstname, setUpdatedFirstname] = useState(student.firstname);
+  const [updatedMiddlename, setUpdatedMiddlename] = useState(
+    student.middlename
+  );
+  const [updatedLastname, setUpdatedLastname] = useState(student.lastname);
   const [updatedCourse, setUpdatedCourse] = useState(student.data.course);
-  const [updateYear, setUpdatedYear] = useState(student.data.year);
+  const [updatedYear, setUpdatedYear] = useState(student.data.year);
   const [updatedAddress, setUpdatedAddress] = useState(student.data.address);
 
   return (
@@ -80,12 +65,28 @@ function EditStudentDialog({
           <X size={20} />
         </button>
 
-        <label className="block mb-2 font-medium">Full Name</label>
+        <label className="block mb-2 font-medium">Firstname</label>
         <input
           type="text"
           className="w-full mb-3 p-2 rounded-lg bg-gray-800 border border-gray-700 text-white"
-          value={updatedFullName}
-          onChange={(e) => setUpdatedFullName(e.target.value)}
+          value={updatedFirstname}
+          onChange={(e) => setUpdatedFirstname(e.target.value)}
+        />
+
+        <label className="block mb-2 font-medium">Middlename</label>
+        <input
+          type="text"
+          className="w-full mb-3 p-2 rounded-lg bg-gray-800 border border-gray-700 text-white"
+          value={updatedMiddlename}
+          onChange={(e) => setUpdatedMiddlename(e.target.value)}
+        />
+
+        <label className="block mb-2 font-medium">Lastname</label>
+        <input
+          type="text"
+          className="w-full mb-3 p-2 rounded-lg bg-gray-800 border border-gray-700 text-white"
+          value={updatedLastname}
+          onChange={(e) => setUpdatedLastname(e.target.value)}
         />
 
         <label className="block mb-2 font-medium">Course</label>
@@ -100,7 +101,7 @@ function EditStudentDialog({
         <input
           type="number"
           className="w-full mb-3 p-2 rounded-lg bg-gray-800 border border-gray-700 text-white"
-          value={updateYear}
+          value={updatedYear}
           onChange={(e) => setUpdatedYear(Number(e.target.value))}
         />
 
@@ -116,14 +117,20 @@ function EditStudentDialog({
           <button
             className="mt-4 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-4 rounded-lg transition"
             onClick={() => {
-              const updatedData = new Student(updatedFullName, {
-                course: updatedCourse,
-                year: updateYear,
-                address: updatedAddress,
-              });
-              updateStudentRequest(student.fullname, updatedData).then(() => {
-                onSave();
-              });
+              const updatedStudent = new Student(
+                updatedFirstname,
+                updatedMiddlename,
+                updatedLastname,
+                {
+                  course: updatedCourse,
+                  year: updatedYear,
+                  address: updatedAddress,
+                }
+              );
+
+              if (!studentDataAreSame(student, updatedStudent)) {
+                setSaveButtonIsClicked(true);
+              }
             }}
           >
             Save
@@ -137,9 +144,32 @@ function EditStudentDialog({
           </button>
         </div>
       </div>
+
+      {saveButtonIsClicked && (
+        <SaveConfirmationDialog
+          onCancel={() => setSaveButtonIsClicked(false)}
+          onConfirm={() => {
+            const updatedStudent = new Student(
+              updatedFirstname,
+              updatedMiddlename,
+              updatedLastname,
+              {
+                course: updatedCourse,
+                year: updatedYear,
+                address: updatedAddress,
+              }
+            );
+
+            updateStudentRequest(student.fullname, updatedStudent).then(() => {
+              onSave();
+            });
+
+            setSaveButtonIsClicked(false);
+          }}
+        />
+      )}
     </div>
   );
 }
 
 export { EditStudentDialog };
-export { DeleteConfirmationDialog };

@@ -1,10 +1,12 @@
 import { X } from "lucide-react";
 import { useState } from "react";
-import { DeleteConfirmationDialog, EditStudentDialog } from "./Dialog";
+import { EditStudentDialog } from "./EditStudent";
+import { DeleteConfirmationDialog } from "./DeleteConfirmation";
 
 class Student {
-  fullname: string;
-
+  firstname: string;
+  middlename: string;
+  lastname: string;
   data: {
     course: string;
     year: number;
@@ -12,14 +14,25 @@ class Student {
   };
 
   constructor(
-    fullname: string,
-    data: { course: string; year: number; address: string }
+    firstname: string = "",
+    middlename: string = "",
+    lastname: string = "",
+    data: { course: string; year: number; address: string } = {
+      course: "",
+      year: 0,
+      address: "",
+    }
   ) {
-    this.fullname = fullname;
+    this.firstname = firstname;
+    this.middlename = middlename;
+    this.lastname = lastname;
     this.data = data;
   }
-}
 
+  get fullname() {
+    return `${this.firstname} ${this.middlename} ${this.lastname}`;
+  }
+}
 async function deleteStudentRequest(fullname: string) {
   fetch("http://localhost:8080/student", {
     method: "DELETE",
@@ -116,7 +129,10 @@ function StudentInfoDialog({
         {editDialogIsOpen && (
           <EditStudentDialog
             student={student}
-            onSave={() => null}
+            onSave={() => {
+              updateChanges();
+              setEditDialogIsOpen(false);
+            }}
             onClose={() => setEditDialogIsOpen(false)}
           />
         )}

@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
-import StudentInfoDialog from "./StudentInfoDialog";
+import StudentInfoDialog from "./dialog/StudentInfo";
+import type { Student } from "./dialog/StudentInfo";
 
 function UsersTable() {
   const [students, setStudents] = useState<any[]>([]);
-  const [selectedStudent, setSelectedStudent] = useState<any | null>(null);
+  const [selectedStudent, setSelectedStudent] = useState<Student | null>(null);
 
   useEffect(() => {
     async function loadStudents() {
@@ -55,7 +56,7 @@ function UsersTable() {
                   onClick={() => setSelectedStudent(stud)}
                 >
                   <td className="px-4 py-3 font-medium text-white">
-                    {stud.fullname}
+                    {stud.firstname} {stud.middlename} {stud.lastname}
                   </td>
                   <td className="px-4 py-3 text-gray-300">
                     {stud.data.course}
@@ -74,11 +75,10 @@ function UsersTable() {
       {selectedStudent && (
         <StudentInfoDialog
           student={selectedStudent}
-          updateChanges={() =>
-            setStudents((prev) =>
-              prev.filter((s) => s.fullname !== selectedStudent.fullname)
-            )
-          }
+          updateChanges={() => {
+            window.location.reload();
+            setSelectedStudent(null);
+          }}
           onClose={() => setSelectedStudent(null)}
         />
       )}
