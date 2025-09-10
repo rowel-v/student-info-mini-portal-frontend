@@ -1,10 +1,13 @@
 import { useEffect, useState } from "react";
 import StudentInfoDialog from "./dialog/StudentInfo";
 import type { Student } from "./dialog/StudentInfo";
+import AddStudentDialog from "./dialog/AddStudent";
 
 function UsersTable() {
   const [students, setStudents] = useState<any[]>([]);
   const [selectedStudent, setSelectedStudent] = useState<Student | null>(null);
+
+  const [addButtonIsClicked, setAddButtonIsClicked] = useState(false);
 
   useEffect(() => {
     async function loadStudents() {
@@ -32,15 +35,18 @@ function UsersTable() {
         {/* Header */}
         <div className="flex items-center justify-between mb-4">
           <h2>Student Data</h2>
-          <button className="bg-indigo-500 hover:bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-medium">
+          <button
+            className="bg-indigo-500 hover:bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-medium"
+            onClick={() => setAddButtonIsClicked(true)}
+          >
             Add Student
           </button>
         </div>
 
         {/* Table */}
-        <div className="overflow-hidden rounded-xl border border-gray-700">
+        <div className="overflow-y-auto rounded-xl border border-gray-700 max-h-[678px]">
           <table className="w-full text-left text-sm">
-            <thead className="bg-gray-700 text-gray-300">
+            <thead className="bg-gray-700 text-gray-300 sticky top-0">
               <tr>
                 <th className="px-4 py-3 font-medium w-1/4">Full Name</th>
                 <th className="px-4 py-3 font-medium w-1/4">Course</th>
@@ -81,6 +87,10 @@ function UsersTable() {
           }}
           onClose={() => setSelectedStudent(null)}
         />
+      )}
+
+      {addButtonIsClicked && (
+        <AddStudentDialog onClose={() => setAddButtonIsClicked(false)} />
       )}
     </div>
   );
