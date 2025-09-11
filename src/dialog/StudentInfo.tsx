@@ -33,13 +33,18 @@ class Student {
     return `${this.firstname} ${this.middlename} ${this.lastname}`;
   }
 }
-async function deleteStudentRequest(fullname: string) {
+async function deleteStudentRequest(
+  firstname: string,
+  middlename: string,
+  lastname: string
+) {
+  console.log(firstname);
   fetch("http://localhost:8080/student", {
     method: "DELETE",
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({ fullname }),
+    body: JSON.stringify({ firstname, middlename, lastname }),
   }).then((response) => {
     if (response.status === 204) {
       console.log("Student deleted successfully");
@@ -117,7 +122,11 @@ function StudentInfoDialog({
         {deleteDialogIsOpen && (
           <DeleteConfirmationDialog
             onConfirm={() => {
-              deleteStudentRequest(student.fullname);
+              deleteStudentRequest(
+                student.firstname,
+                student.middlename,
+                student.lastname
+              );
               updateChanges();
               setDeleteDialogIsOpen(false);
               onClose(); // also close main dialog
