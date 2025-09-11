@@ -90,7 +90,10 @@ function UsersTable() {
       )}
 
       {addButtonIsClicked && (
-        <AddStudentDialog onClose={() => setAddButtonIsClicked(false)} />
+        <AddStudentDialog
+          onClose={() => setAddButtonIsClicked(false)}
+          addSuccess={() => window.location.reload()}
+        />
       )}
     </div>
   );

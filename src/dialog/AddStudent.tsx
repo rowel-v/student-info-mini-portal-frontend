@@ -13,7 +13,13 @@ async function addStudentRequest(student: Student) {
   return result.status === 204 ? true : false;
 }
 
-function AddStudentDialog({ onClose }: { onClose: () => void }) {
+function AddStudentDialog({
+  onClose,
+  addSuccess,
+}: {
+  onClose: () => void;
+  addSuccess: () => void;
+}) {
   const [firstname, setFirstname] = useState("");
   const [middlename, setMiddlename] = useState("");
   const [lastname, setLastname] = useState("");
@@ -46,12 +52,11 @@ function AddStudentDialog({ onClose }: { onClose: () => void }) {
             const isSuccess = await addStudentRequest(student);
 
             if (isSuccess) {
-              window.location.reload;
+              addSuccess();
             } else {
               // later
               console.log("faileds");
             }
-            console.log(student);
             onClose(); // close dialog or handle save
           }}
         >
