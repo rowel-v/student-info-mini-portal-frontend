@@ -12,7 +12,9 @@ function UsersTable() {
   useEffect(() => {
     async function loadStudents() {
       try {
-        const response = await fetch("http://localhost:8080/student");
+        const response = await fetch(
+          "https://historic-alfy-springboot-api-7f312945.koyeb.app/student"
+        );
         const data = await response.json();
         setStudents(data);
       } catch (error) {

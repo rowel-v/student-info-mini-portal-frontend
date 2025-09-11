@@ -3,13 +3,16 @@ import { useState } from "react";
 import { Student } from "./StudentInfo";
 
 async function addStudentRequest(student: Student) {
-  const result = await fetch(`http://localhost:8080/student`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(student),
-  });
+  const result = await fetch(
+    `https://historic-alfy-springboot-api-7f312945.koyeb.app/student`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(student),
+    }
+  );
   return result.status === 204 ? true : false;
 }
 

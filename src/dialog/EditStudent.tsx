@@ -7,13 +7,16 @@ async function updateStudentRequest(
   fullname: string,
   UpdatedStudentData: Student
 ) {
-  const response = await fetch(`http://localhost:8080/student/${fullname}`, {
-    method: "PUT",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(UpdatedStudentData),
-  });
+  const response = await fetch(
+    `https://historic-alfy-springboot-api-7f312945.koyeb.app/student/${fullname}`,
+    {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(UpdatedStudentData),
+    }
+  );
   if (response.status === 200 || response.status === 204) {
     console.log("Student updated successfully");
   } else {

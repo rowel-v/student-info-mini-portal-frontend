@@ -39,7 +39,7 @@ async function deleteStudentRequest(
   lastname: string
 ) {
   console.log(firstname);
-  fetch("http://localhost:8080/student", {
+  fetch("https://historic-alfy-springboot-api-7f312945.koyeb.app/student", {
     method: "DELETE",
     headers: {
       "Content-Type": "application/json",
