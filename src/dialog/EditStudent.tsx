@@ -2,13 +2,16 @@ import { X } from "lucide-react";
 import { Student } from "./StudentInfo";
 import { useState } from "react";
 import { SaveConfirmationDialog } from "./SaveConfirmation";
+import { ServicePaths } from "../myconfig";
 
 async function updateStudentRequest(
   fullname: string,
   UpdatedStudentData: Student
 ) {
   const response = await fetch(
-    `https://historic-alfy-springboot-api-7f312945.koyeb.app/student/${fullname}`,
+    //`https://historic-alfy-springboot-api-7f312945.koyeb.app/student/${fullname}`
+    ServicePaths.prod + fullname,
+    //ServicePaths.dev + fullname,
     {
       method: "PUT",
       headers: {

@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import StudentInfoDialog from "./dialog/StudentInfo";
 import type { Student } from "./dialog/StudentInfo";
 import AddStudentDialog from "./dialog/AddStudent";
+import { ServicePaths } from "./myconfig";
 
 function UsersTable() {
   const [students, setStudents] = useState<any[]>([]);
@@ -13,7 +14,9 @@ function UsersTable() {
     async function loadStudents() {
       try {
         const response = await fetch(
-          "https://historic-alfy-springboot-api-7f312945.koyeb.app/student"
+          //"https://historic-alfy-springboot-api-7f312945.koyeb.app/student"
+          ServicePaths.prod
+          //ServicePaths.dev
         );
         const data = await response.json();
         setStudents(data);
@@ -93,7 +96,7 @@ function UsersTable() {
 
       {addButtonIsClicked && (
         <AddStudentDialog
-          onClose={() => setAddButtonIsClicked(false)}
+          onClose={() => setAddButtonIsClicked(true)} //  later
           addSuccess={() => window.location.reload()}
         />
       )}

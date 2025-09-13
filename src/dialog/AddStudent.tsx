@@ -1,10 +1,14 @@
 import { X } from "lucide-react";
 import { useState } from "react";
 import { Student } from "./StudentInfo";
+import { ServicePaths } from "../myconfig";
+import LoadingDialog from "./Loading";
 
-async function addStudentRequest(student: Student) {
+async function addStudentRequest(student: Student): Promise<boolean> {
   const result = await fetch(
-    `https://historic-alfy-springboot-api-7f312945.koyeb.app/student`,
+    //`https://historic-alfy-springboot-api-7f312945.koyeb.app/student`
+    ServicePaths.prod,
+    // ServicePaths.dev,
     {
       method: "POST",
       headers: {
@@ -30,6 +34,8 @@ function AddStudentDialog({
   const [year, setYear] = useState(1);
   const [address, setAddress] = useState("");
 
+  const [addButtonIsClicked, setAddButtonIsClicked] = useState(false);
+
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-gray/20 backdrop-blur-sm">
       <div className="relative bg-gray-900 p-6 rounded-2xl shadow-2xl w-96 transform transition-all scale-100 animate-fadeIn">
@@ -45,6 +51,7 @@ function AddStudentDialog({
 
         <form
           onSubmit={async (e) => {
+            setAddButtonIsClicked(true);
             e.preventDefault();
             const student = new Student(firstname, middlename, lastname, {
               course,
@@ -56,6 +63,7 @@ function AddStudentDialog({
 
             if (isSuccess) {
               addSuccess();
+              setAddButtonIsClicked(false);
             } else {
               // later
               console.log("faileds");
@@ -129,6 +137,8 @@ function AddStudentDialog({
           </div>
         </form>
       </div>
+
+      {addButtonIsClicked && <LoadingDialog open={addButtonIsClicked} />}
     </div>
   );
 }

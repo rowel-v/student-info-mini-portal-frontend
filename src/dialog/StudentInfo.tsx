@@ -2,6 +2,8 @@ import { X } from "lucide-react";
 import { useState } from "react";
 import { EditStudentDialog } from "./EditStudent";
 import { DeleteConfirmationDialog } from "./DeleteConfirmation";
+import { ServicePaths } from "../myconfig";
+import LoadingDialog from "./Loading";
 
 class Student {
   firstname: string;
@@ -37,21 +39,27 @@ async function deleteStudentRequest(
   firstname: string,
   middlename: string,
   lastname: string
-) {
+): Promise<boolean> {
   console.log(firstname);
-  fetch("https://historic-alfy-springboot-api-7f312945.koyeb.app/student", {
-    method: "DELETE",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ firstname, middlename, lastname }),
-  }).then((response) => {
-    if (response.status === 204) {
-      console.log("Student deleted successfully");
-    } else {
-      console.error("Failed to delete student");
+  const response = await fetch(
+    //"https://historic-alfy-springboot-api-7f312945.koyeb.app/student"
+    ServicePaths.prod,
+    // ServicePaths.dev,
+    {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ firstname, middlename, lastname }),
     }
-  });
+  );
+  if (response.status === 204) {
+    console.log("Student deleted successfully");
+    return true;
+  } else {
+    console.error("Failed to delete student");
+    return false;
+  }
 }
 
 function StudentInfoDialog({
@@ -65,6 +73,8 @@ function StudentInfoDialog({
 }) {
   const [deleteDialogIsOpen, setDeleteDialogIsOpen] = useState(false);
   const [editDialogIsOpen, setEditDialogIsOpen] = useState(false);
+
+  const [deleteBtnClicked, setDeleteBtnClicked] = useState(false);
 
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-gray/20 backdrop-blur-sm">
@@ -121,15 +131,24 @@ function StudentInfoDialog({
         {/* Delete confirmation dialog */}
         {deleteDialogIsOpen && (
           <DeleteConfirmationDialog
-            onConfirm={() => {
-              deleteStudentRequest(
+            onConfirm={async () => {
+              setDeleteBtnClicked(true);
+
+              const res = await deleteStudentRequest(
                 student.firstname,
                 student.middlename,
                 student.lastname
               );
-              updateChanges();
-              setDeleteDialogIsOpen(false);
-              onClose(); // also close main dialog
+
+              if (res) {
+                setDeleteBtnClicked(false);
+                onClose();
+                setDeleteDialogIsOpen(false);
+              } else {
+              }
+              // updateChanges();
+              //setDeleteDialogIsOpen(false);
+              //onClose(); // also close main dialog
             }}
             onCancel={() => setDeleteDialogIsOpen(false)}
           />
@@ -146,6 +165,8 @@ function StudentInfoDialog({
           />
         )}
       </div>
+
+      {deleteBtnClicked && <LoadingDialog open={deleteBtnClicked} />}
     </div>
   );
 }
