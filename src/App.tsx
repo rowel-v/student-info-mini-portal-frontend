@@ -3,12 +3,14 @@ import StudentInfoDialog from "./dialog/StudentInfo";
 import type { Student } from "./dialog/StudentInfo";
 import AddStudentDialog from "./dialog/AddStudent";
 import { ServicePaths } from "./myconfig";
+import LoadingDialog from "./dialog/Loading";
 
 function UsersTable() {
   const [students, setStudents] = useState<any[]>([]);
   const [selectedStudent, setSelectedStudent] = useState<Student | null>(null);
 
   const [addButtonIsClicked, setAddButtonIsClicked] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function loadStudents() {
@@ -22,11 +24,22 @@ function UsersTable() {
         setStudents(data);
       } catch (error) {
         console.error("Fetch error:", error);
+      } finally {
+        setLoading(false);
       }
     }
 
     loadStudents();
   }, []);
+
+  const [addFailed, setAddFailed] = useState(false);
+
+  useEffect(() => {
+    if (addFailed) {
+      const timer = setTimeout(() => setAddFailed(false), 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [addFailed]);
 
   return (
     <div className="min-h-screen bg-gray-900 text-gray-100 p-8">
@@ -83,22 +96,28 @@ function UsersTable() {
         </div>
       </div>
 
+      {loading && <LoadingDialog open={true} />}
+
       {selectedStudent && (
         <StudentInfoDialog
           student={selectedStudent}
-          updateChanges={() => {
-            window.location.reload();
-            setSelectedStudent(null);
-          }}
           onClose={() => setSelectedStudent(null)}
         />
       )}
 
       {addButtonIsClicked && (
         <AddStudentDialog
-          onClose={() => setAddButtonIsClicked(true)} //  later
-          addSuccess={() => window.location.reload()}
+          onClose={() => setAddButtonIsClicked(false)} //  later
+          addFailed={() => setAddFailed(true)}
         />
+      )}
+
+      {addFailed && (
+        <div className="fixed inset-0 flex items-center justify-center z-50">
+          <div className="bg-red-900/70 text-white px-6 py-3 rounded-lg shadow-lg">
+            <p>Student already exists</p>
+          </div>
+        </div>
       )}
     </div>
   );

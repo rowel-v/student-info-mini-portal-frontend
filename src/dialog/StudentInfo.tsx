@@ -65,16 +65,14 @@ async function deleteStudentRequest(
 function StudentInfoDialog({
   student,
   onClose,
-  updateChanges,
 }: {
   student: Student;
   onClose: () => void;
-  updateChanges: () => void;
 }) {
   const [deleteDialogIsOpen, setDeleteDialogIsOpen] = useState(false);
   const [editDialogIsOpen, setEditDialogIsOpen] = useState(false);
 
-  const [deleteBtnClicked, setDeleteBtnClicked] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-gray/20 backdrop-blur-sm">
@@ -132,23 +130,20 @@ function StudentInfoDialog({
         {deleteDialogIsOpen && (
           <DeleteConfirmationDialog
             onConfirm={async () => {
-              setDeleteBtnClicked(true);
+              setLoading(true);
 
-              const res = await deleteStudentRequest(
+              const deleteSuccess = await deleteStudentRequest(
                 student.firstname,
                 student.middlename,
                 student.lastname
               );
 
-              if (res) {
-                setDeleteBtnClicked(false);
-                onClose();
+              if (deleteSuccess) {
+                window.location.reload();
                 setDeleteDialogIsOpen(false);
               } else {
+                // later
               }
-              // updateChanges();
-              //setDeleteDialogIsOpen(false);
-              //onClose(); // also close main dialog
             }}
             onCancel={() => setDeleteDialogIsOpen(false)}
           />
@@ -157,16 +152,12 @@ function StudentInfoDialog({
         {editDialogIsOpen && (
           <EditStudentDialog
             student={student}
-            onSave={() => {
-              updateChanges();
-              setEditDialogIsOpen(false);
-            }}
             onClose={() => setEditDialogIsOpen(false)}
           />
         )}
       </div>
 
-      {deleteBtnClicked && <LoadingDialog open={deleteBtnClicked} />}
+      {loading && <LoadingDialog open={true} />}
     </div>
   );
 }

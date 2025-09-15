@@ -22,10 +22,10 @@ async function addStudentRequest(student: Student): Promise<boolean> {
 
 function AddStudentDialog({
   onClose,
-  addSuccess,
+  addFailed,
 }: {
   onClose: () => void;
-  addSuccess: () => void;
+  addFailed: () => void;
 }) {
   const [firstname, setFirstname] = useState("");
   const [middlename, setMiddlename] = useState("");
@@ -34,7 +34,7 @@ function AddStudentDialog({
   const [year, setYear] = useState(1);
   const [address, setAddress] = useState("");
 
-  const [addButtonIsClicked, setAddButtonIsClicked] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-gray/20 backdrop-blur-sm">
@@ -51,7 +51,7 @@ function AddStudentDialog({
 
         <form
           onSubmit={async (e) => {
-            setAddButtonIsClicked(true);
+            setLoading(true);
             e.preventDefault();
             const student = new Student(firstname, middlename, lastname, {
               course,
@@ -62,11 +62,10 @@ function AddStudentDialog({
             const isSuccess = await addStudentRequest(student);
 
             if (isSuccess) {
-              addSuccess();
-              setAddButtonIsClicked(false);
+              window.location.reload();
             } else {
-              // later
-              console.log("faileds");
+              setLoading(false);
+              addFailed();
             }
             onClose(); // close dialog or handle save
           }}
@@ -138,7 +137,7 @@ function AddStudentDialog({
         </form>
       </div>
 
-      {addButtonIsClicked && <LoadingDialog open={addButtonIsClicked} />}
+      {loading && <LoadingDialog open={true} />}
     </div>
   );
 }

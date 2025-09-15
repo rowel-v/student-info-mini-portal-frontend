@@ -3,6 +3,7 @@ import { Student } from "./StudentInfo";
 import { useState } from "react";
 import { SaveConfirmationDialog } from "./SaveConfirmation";
 import { ServicePaths } from "../myconfig";
+import LoadingDialog from "./Loading";
 
 async function updateStudentRequest(
   fullname: string,
@@ -10,7 +11,7 @@ async function updateStudentRequest(
 ) {
   const response = await fetch(
     //`https://historic-alfy-springboot-api-7f312945.koyeb.app/student/${fullname}`
-    ServicePaths.prod + fullname,
+    ServicePaths.prod + "/" + fullname,
     //ServicePaths.dev + fullname,
     {
       method: "PUT",
@@ -22,8 +23,10 @@ async function updateStudentRequest(
   );
   if (response.status === 200 || response.status === 204) {
     console.log("Student updated successfully");
+    return true;
   } else {
     console.error("Failed to update student");
+    return false;
   }
 }
 
@@ -39,11 +42,9 @@ const studentDataAreSame = (student1: Student, student2: Student): boolean => {
 };
 
 function EditStudentDialog({
-  onSave,
   onClose,
   student,
 }: {
-  onSave: () => void;
   onClose: () => void;
   student: Student;
 }) {
@@ -57,6 +58,9 @@ function EditStudentDialog({
   const [updatedCourse, setUpdatedCourse] = useState(student.data.course);
   const [updatedYear, setUpdatedYear] = useState(student.data.year);
   const [updatedAddress, setUpdatedAddress] = useState(student.data.address);
+
+  const [loading, setLoading] = useState(false);
+  const [updateFailed, setUpdateFailed] = useState(false);
 
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-gray/20 backdrop-blur-sm">
@@ -154,7 +158,10 @@ function EditStudentDialog({
       {saveButtonIsClicked && (
         <SaveConfirmationDialog
           onCancel={() => setSaveButtonIsClicked(false)}
-          onConfirm={() => {
+          onConfirm={async () => {
+            //setSaveButtonIsClicked(false);
+            setLoading(true);
+
             const updatedStudent = new Student(
               updatedFirstname,
               updatedMiddlename,
@@ -166,14 +173,29 @@ function EditStudentDialog({
               }
             );
 
-            updateStudentRequest(student.fullname, updatedStudent).then(() => {
-              onSave();
-            });
+            const updateSuccess = await updateStudentRequest(
+              student.fullname,
+              updatedStudent
+            );
+
+            if (updateSuccess) {
+              window.location.reload();
+            } else {
+              setUpdateFailed(true);
+            }
 
             setSaveButtonIsClicked(false);
           }}
         />
       )}
+
+      {updateFailed && (
+        <div className="bg-red-500/20 text-red-400 border border-red-500 rounded-lg px-4 py-2 mt-3">
+          <p>Student already exists</p>
+        </div>
+      )}
+
+      {loading && <LoadingDialog open={true} />}
     </div>
   );
 }
